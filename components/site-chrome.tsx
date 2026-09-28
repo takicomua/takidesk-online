@@ -48,11 +48,19 @@ export function SiteHeader({
 export function SiteFooter() {
   return (
     <footer className="relative z-10 mx-auto mt-auto w-full max-w-6xl px-5 py-10 text-sm text-[var(--muted)] sm:px-8">
-      <div className="flex flex-col gap-2 border-t border-[var(--line)] pt-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 border-t border-[var(--line)] pt-6 sm:flex-row sm:items-center sm:justify-between">
         <p>
           © {new Date().getFullYear()} {site.name}. Стрім іде з твого ПК.
         </p>
-        <p className="text-[var(--teal)]">Без медіа-ретрансляції через наші сервери.</p>
+        <div className="flex flex-wrap gap-4">
+          <Link href="/privacy" className="hover:text-[var(--fg)]">
+            Конфіденційність
+          </Link>
+          <Link href="/terms" className="hover:text-[var(--fg)]">
+            Умови
+          </Link>
+          <span className="text-[var(--teal)]">Без медіа-ретрансляції</span>
+        </div>
       </div>
     </footer>
   );

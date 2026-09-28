@@ -2,22 +2,19 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { loginAction } from "@/lib/actions";
-import { getSessionUser } from "@/lib/auth";
+import { consumeFlash, getSessionUser } from "@/lib/auth";
 
 export const metadata = {
   title: "Увійти",
 };
 
-export default async function LoginPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ error?: string }>;
-}) {
+export const dynamic = "force-dynamic";
+
+export default async function LoginPage() {
   const user = await getSessionUser();
   if (user) redirect("/dashboard");
 
-  const params = await searchParams;
-  const error = params.error;
+  const error = await consumeFlash();
 
   return (
     <>
@@ -26,11 +23,14 @@ export default async function LoginPage({
         <div className="surface rounded-3xl p-6 sm:p-8">
           <h1 className="font-display text-3xl font-bold tracking-tight">Увійти</h1>
           <p className="mt-2 text-sm text-[var(--muted)]">
-            Доступ до завантажень і кабінету takiDesk Online.
+            Доступ до кабінету takiDesk Online.
           </p>
 
           {error ? (
-            <p className="mt-4 rounded-2xl border border-[color-mix(in_oklab,var(--danger)_45%,transparent)] bg-[color-mix(in_oklab,var(--danger)_12%,transparent)] px-3 py-2 text-sm text-[#ffb4b4]">
+            <p
+              role="alert"
+              className="mt-4 rounded-2xl border border-[color-mix(in_oklab,var(--danger)_45%,transparent)] bg-[color-mix(in_oklab,var(--danger)_12%,transparent)] px-3 py-2 text-sm text-[#ffb4b4]"
+            >
               {error}
             </p>
           ) : null}

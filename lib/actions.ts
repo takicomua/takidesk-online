@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { destroySession, loginUser, registerUser } from "./auth";
+import { destroySession, loginUser, registerUser, setFlash } from "./auth";
 
 export async function registerAction(formData: FormData) {
   const result = await registerUser({
@@ -11,7 +11,8 @@ export async function registerAction(formData: FormData) {
   });
 
   if (!result.ok) {
-    redirect(`/register?error=${encodeURIComponent(result.error)}`);
+    await setFlash(result.error);
+    redirect("/register");
   }
 
   redirect("/dashboard");
@@ -24,7 +25,8 @@ export async function loginAction(formData: FormData) {
   });
 
   if (!result.ok) {
-    redirect(`/login?error=${encodeURIComponent(result.error)}`);
+    await setFlash(result.error);
+    redirect("/login");
   }
 
   redirect("/dashboard");

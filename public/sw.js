@@ -1,17 +1,19 @@
-const CACHE = "takidesk-online-v1";
-const ASSETS = ["/", "/dashboard", "/login", "/register", "/manifest.webmanifest"];
+const CACHE = "takidesk-static-v2";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE).then((cache) => cache.addAll(ASSETS)).then(() => self.skipWaiting()),
+    caches.open(CACHE).then((cache) =>
+      cache.addAll(["/icons/icon-192.png", "/icons/icon-512.png", "/manifest.webmanifest"]),
+    ).then(() => self.skipWaiting()),
   );
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))),
-    ).then(() => self.clients.claim()),
+    caches
+      .keys()
+      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then(() => self.clients.claim()),
   );
 });
 
@@ -19,13 +21,28 @@ self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
 
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+
+  // Never cache HTML / app routes / auth — only static assets.
+  const isStatic =
+    url.pathname.startsWith("/_next/static/") ||
+    url.pathname.startsWith("/icons/") ||
+    url.pathname === "/manifest.webmanifest" ||
+    url.pathname === "/sw.js";
+
+  if (!isStatic) return;
+
   event.respondWith(
-    fetch(req)
-      .then((res) => {
-        const copy = res.clone();
-        caches.open(CACHE).then((cache) => cache.put(req, copy));
-        return res;
-      })
-      .catch(() => caches.match(req).then((cached) => cached || caches.match("/"))),
+    caches.open(CACHE).then(async (cache) => {
+      const cached = await cache.match(req);
+      const network = fetch(req)
+        .then((res) => {
+          if (res.ok) cache.put(req, res.clone());
+          return res;
+        })
+        .catch(() => cached);
+      return cached || network;
+    }),
   );
 });

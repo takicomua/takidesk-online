@@ -8,6 +8,8 @@ export const metadata = {
   title: "Кабінет",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
   const user = await getSessionUser();
   if (!user) redirect("/login");
@@ -24,52 +26,57 @@ export default async function DashboardPage() {
             Привіт, {user.name}
           </h1>
           <p className="text-[var(--muted)]">
-            Скачай додаток на ПК і постав PWA на телефон. Підключення працює через твій
-            компʼютер — без навантаження на наші сервери.
+            Три кроки — і ти на звʼязку зі своїм ПК. Стрім іде з твого компʼютера, не через наші
+            сервери.
           </p>
         </div>
 
-        <div className="mt-10 grid gap-5 lg:grid-cols-2">
-          <section className="surface rounded-3xl p-6 sm:p-7">
-            <p className="text-sm text-[var(--accent)]">01 · Windows</p>
-            <h2 className="mt-2 font-display text-2xl font-bold">Додаток для ПК</h2>
+        <ol className="mt-10 grid gap-5 lg:grid-cols-3">
+          <li className="surface rounded-3xl p-6 sm:p-7">
+            <p className="text-sm text-[var(--accent)]">Крок 1 · готово</p>
+            <h2 className="mt-2 font-display text-2xl font-bold">Акаунт</h2>
             <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
-              Встанови takiDesk на компʼютер, увійди тим самим акаунтом (або запусти агент)
-              і тримай ПК онлайн, коли хочеш підключатись.
+              Ти вже зареєстрований. Email:{" "}
+              <span className="text-[var(--fg)]">{user.email}</span>
+            </p>
+            <p className="mt-4 text-sm text-[var(--teal)]">✓ Виконано</p>
+          </li>
+
+          <li className="surface rounded-3xl p-6 sm:p-7">
+            <p className="text-sm text-[var(--accent)]">Крок 2</p>
+            <h2 className="mt-2 font-display text-2xl font-bold">Додаток на ПК</h2>
+            <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
+              Встанови takiDesk на Windows і залиш програму запущеною, коли хочеш підключатись.
             </p>
             <a
               href={downloads.pc}
               className="btn btn-primary mt-6"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
             >
               Завантажити для Windows
             </a>
-          </section>
+          </li>
 
-          <section className="surface rounded-3xl p-6 sm:p-7">
-            <p className="text-sm text-[var(--teal)]">02 · Телефон</p>
+          <li className="surface rounded-3xl p-6 sm:p-7">
+            <p className="text-sm text-[var(--teal)]">Крок 3</p>
             <h2 className="mt-2 font-display text-2xl font-bold">PWA на телефон</h2>
             <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
-              Відкрий цей сайт у Chrome / Safari і встанови як додаток. Так takiDesk Online
-              завжди під рукою з головного екрану.
+              Встанови цей сайт як додаток — кабінет завжди на головному екрані телефону.
             </p>
             <div className="mt-6">
               <InstallPwaButton />
             </div>
-          </section>
-        </div>
+          </li>
+        </ol>
 
         <section className="surface mt-5 rounded-3xl p-6 sm:p-7">
-          <h2 className="font-display text-2xl font-bold">Швидкий старт</h2>
+          <h2 className="font-display text-2xl font-bold">Як користуватись</h2>
           <ol className="mt-4 space-y-3 text-sm text-[var(--muted)]">
-            <li>1. Встанови takiDesk на ПК і залиш його запущеним у домашній мережі.</li>
-            <li>2. Постав PWA на телефон з цієї сторінки.</li>
-            <li>3. Підключайся з телефону до свого компʼютера, коли він увімкнений.</li>
+            <li>1. ПК увімкнений, takiDesk запущений.</li>
+            <li>2. Відкрий PWA на телефоні → кабінет.</li>
+            <li>3. Підключайся до свого компʼютера з будь-якої мережі.</li>
           </ol>
-          <p className="mt-4 text-xs text-[var(--muted)]">
-            Акаунт: <span className="text-[var(--fg)]">{user.email}</span>
-          </p>
         </section>
       </main>
       <SiteFooter />

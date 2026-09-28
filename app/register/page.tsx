@@ -2,35 +2,36 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { registerAction } from "@/lib/actions";
-import { getSessionUser } from "@/lib/auth";
+import { consumeFlash, getSessionUser } from "@/lib/auth";
 
 export const metadata = {
   title: "Реєстрація",
 };
 
-export default async function RegisterPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ error?: string }>;
-}) {
+export const dynamic = "force-dynamic";
+
+export default async function RegisterPage() {
   const user = await getSessionUser();
   if (user) redirect("/dashboard");
 
-  const params = await searchParams;
-  const error = params.error;
+  const error = await consumeFlash();
 
   return (
     <>
       <SiteHeader />
       <main className="relative z-10 mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-5 py-10 sm:px-8">
         <div className="surface rounded-3xl p-6 sm:p-8">
-          <h1 className="font-display text-3xl font-bold tracking-tight">Створити акаунт</h1>
+          <p className="text-sm text-[var(--accent)]">Крок 1 з 3</p>
+          <h1 className="mt-2 font-display text-3xl font-bold tracking-tight">Створити акаунт</h1>
           <p className="mt-2 text-sm text-[var(--muted)]">
-            Після реєстрації відкриється кабінет із завантаженням для ПК і PWA.
+            Далі скачаєш додаток на ПК і поставиш PWA на телефон.
           </p>
 
           {error ? (
-            <p className="mt-4 rounded-2xl border border-[color-mix(in_oklab,var(--danger)_45%,transparent)] bg-[color-mix(in_oklab,var(--danger)_12%,transparent)] px-3 py-2 text-sm text-[#ffb4b4]">
+            <p
+              role="alert"
+              className="mt-4 rounded-2xl border border-[color-mix(in_oklab,var(--danger)_45%,transparent)] bg-[color-mix(in_oklab,var(--danger)_12%,transparent)] px-3 py-2 text-sm text-[#ffb4b4]"
+            >
               {error}
             </p>
           ) : null}
@@ -51,7 +52,7 @@ export default async function RegisterPage({
               />
             </label>
             <label className="block space-y-2 text-sm">
-              <span className="text-[var(--muted)]">Пароль</span>
+              <span className="text-[var(--muted)]">Пароль (літери + цифри, мін. 8)</span>
               <input
                 className="field"
                 name="password"

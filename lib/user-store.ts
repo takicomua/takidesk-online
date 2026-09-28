@@ -1,93 +1,100 @@
-import { put, list, get } from "@vercel/blob";
+import { put, list, get, head } from "@vercel/blob";
 import { promises as fs } from "fs";
 import path from "path";
-import type { UserRecord, UsersFile } from "./types";
+import type { UserRecord } from "./types";
+import { requireBlobToken, useBlobStorage } from "./config";
+import { hashEmail } from "./hash";
 
-const LOCAL_PATH = path.join(process.cwd(), "data", "users.json");
-const BLOB_PATHNAME = "takidesk-online/users.json";
+const LOCAL_DIR = path.join(process.cwd(), "data", "users");
 
-function emptyStore(): UsersFile {
-  return { users: [] };
+async function userBlobPath(email: string) {
+  return `takidesk-online/users/${await hashEmail(email)}.json`;
 }
 
-async function readLocal(): Promise<UsersFile> {
+async function localUserPath(email: string) {
+  return path.join(LOCAL_DIR, `${await hashEmail(email)}.json`);
+}
+
+async function readLocalUser(email: string): Promise<UserRecord | null> {
   try {
-    const raw = await fs.readFile(LOCAL_PATH, "utf8");
-    return JSON.parse(raw) as UsersFile;
+    const raw = await fs.readFile(await localUserPath(email), "utf8");
+    return JSON.parse(raw) as UserRecord;
   } catch {
-    return emptyStore();
+    return null;
   }
 }
 
-async function writeLocal(data: UsersFile): Promise<void> {
-  await fs.mkdir(path.dirname(LOCAL_PATH), { recursive: true });
-  await fs.writeFile(LOCAL_PATH, JSON.stringify(data, null, 2), "utf8");
+async function writeLocalUser(user: UserRecord): Promise<void> {
+  await fs.mkdir(LOCAL_DIR, { recursive: true });
+  const file = await localUserPath(user.email);
+  try {
+    await fs.writeFile(file, JSON.stringify(user, null, 2), {
+      encoding: "utf8",
+      flag: "wx",
+    });
+  } catch (err) {
+    const code = err && typeof err === "object" && "code" in err ? String(err.code) : "";
+    if (code === "EEXIST") throw new Error("EMAIL_TAKEN");
+    throw err;
+  }
 }
 
-async function readBlob(): Promise<UsersFile> {
-  const token = process.env.BLOB_READ_WRITE_TOKEN;
-  if (!token) return emptyStore();
+async function readBlobUser(email: string): Promise<UserRecord | null> {
+  const token = requireBlobToken();
+  const pathname = await userBlobPath(email);
 
-  const listed = await list({ prefix: BLOB_PATHNAME, limit: 5, token });
-  const exists = listed.blobs.some((b) => b.pathname === BLOB_PATHNAME);
-  if (!exists) return emptyStore();
-
-  const result = await get(BLOB_PATHNAME, { access: "private", token, useCache: false });
-  if (!result?.stream) {
-    return emptyStore();
+  try {
+    await head(pathname, { token });
+  } catch {
+    return null;
   }
 
+  const result = await get(pathname, { access: "private", token, useCache: false });
+  if (!result?.stream) return null;
   const text = await new Response(result.stream).text();
-  return JSON.parse(text) as UsersFile;
+  return JSON.parse(text) as UserRecord;
 }
 
-async function writeBlob(data: UsersFile): Promise<void> {
-  const token = process.env.BLOB_READ_WRITE_TOKEN;
-  if (!token) {
-    throw new Error("BLOB_READ_WRITE_TOKEN is not configured");
+async function writeBlobUser(user: UserRecord): Promise<void> {
+  const token = requireBlobToken();
+  const pathname = await userBlobPath(user.email);
+
+  try {
+    await head(pathname, { token });
+    throw new Error("EMAIL_TAKEN");
+  } catch (err) {
+    if (err instanceof Error && err.message === "EMAIL_TAKEN") throw err;
   }
-  await put(BLOB_PATHNAME, JSON.stringify(data, null, 2), {
-    access: "private",
-    addRandomSuffix: false,
-    allowOverwrite: true,
-    contentType: "application/json",
-    token,
-  });
-}
 
-function useBlob() {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
-}
-
-export async function getUsers(): Promise<UserRecord[]> {
-  const store = useBlob() ? await readBlob() : await readLocal();
-  return store.users;
-}
-
-export async function saveUsers(users: UserRecord[]): Promise<void> {
-  const payload: UsersFile = { users };
-  if (useBlob()) {
-    await writeBlob(payload);
-  } else {
-    await writeLocal(payload);
+  try {
+    await put(pathname, JSON.stringify(user, null, 2), {
+      access: "private",
+      addRandomSuffix: false,
+      allowOverwrite: false,
+      contentType: "application/json",
+      token,
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    if (/already exists|overwrite|precondition|conflict/i.test(message)) {
+      throw new Error("EMAIL_TAKEN");
+    }
+    throw err;
   }
 }
 
 export async function findUserByEmail(email: string): Promise<UserRecord | undefined> {
-  const users = await getUsers();
   const normalized = email.trim().toLowerCase();
-  return users.find((u) => u.email === normalized);
+  const user = useBlobStorage()
+    ? await readBlobUser(normalized)
+    : await readLocalUser(normalized);
+  return user ?? undefined;
 }
 
 export async function createUser(
   user: Omit<UserRecord, "id" | "createdAt"> & { id?: string },
 ): Promise<UserRecord> {
-  const users = await getUsers();
   const email = user.email.trim().toLowerCase();
-  if (users.some((u) => u.email === email)) {
-    throw new Error("EMAIL_TAKEN");
-  }
-
   const record: UserRecord = {
     id: user.id ?? crypto.randomUUID(),
     name: user.name.trim(),
@@ -96,7 +103,25 @@ export async function createUser(
     createdAt: new Date().toISOString(),
   };
 
-  users.push(record);
-  await saveUsers(users);
+  if (!useBlobStorage()) {
+    if (process.env.VERCEL === "1") {
+      throw new Error("STORAGE_UNAVAILABLE");
+    }
+    await writeLocalUser(record);
+    return record;
+  }
+
+  await writeBlobUser(record);
   return record;
+}
+
+export async function blobStoreHealthy(): Promise<boolean> {
+  if (!useBlobStorage()) return process.env.VERCEL !== "1";
+  try {
+    const token = requireBlobToken();
+    await list({ prefix: "takidesk-online/", limit: 1, token });
+    return true;
+  } catch {
+    return false;
+  }
 }

@@ -1,36 +1,40 @@
 # takiDesk Online
 
-Сайт продукту: інформація, реєстрація, кабінет із завантаженням для ПК і PWA для телефону.
+SaaS-портал: лендінг → реєстрація → кабінет (завантаження ПК + PWA).
+Медіа remote desktop **не** проходить через цей сайт.
 
-Окремий проєкт від desktop-агента `texnolodgia` / takiDesk. Медіа-трафік remote desktop **не** йде через цей сайт.
+## Три кроки для користувача
 
-## Локально
+1. Реєстрація акаунта  
+2. Завантажити додаток на ПК  
+3. Встановити PWA на телефон  
+
+## Локально (з коробки)
 
 ```bash
 npm install
 npm run dev
 ```
 
-Відкрий [http://localhost:3000](http://localhost:3000).
+Акаунти: `data/users/*.json` (gitignore). `AUTH_SECRET` у `.env.local` бажаний, але для dev є fallback.
 
-Акаунти зберігаються в `data/users.json` (локально, gitignore).
+## Прод на Vercel (обовʼязково)
 
-## Змінні оточення
+1. `AUTH_SECRET` ≥ 32 випадкові символи (Production / Preview / Development)  
+2. Blob Store (private) → `BLOB_READ_WRITE_TOKEN`  
+3. (Опційно) `NEXT_PUBLIC_PC_DOWNLOAD_URL` на реальний інсталер  
 
-Скопіюй `.env.example` → `.env.local`:
+Перевірка: `GET /api/health` → `{ "ok": true }`
 
-- `AUTH_SECRET` — секрет для сесій (обовʼязково на Vercel, мін. 16 символів)
-- `BLOB_READ_WRITE_TOKEN` — Vercel Blob (на проді; локально не потрібен)
-- `NEXT_PUBLIC_PC_DOWNLOAD_URL` — лінк на Windows-інсталер
-- `NEXT_PUBLIC_ANDROID_DOWNLOAD_URL` — опційний лінк на APK
+## Безпека
 
-## Деплой
-
-1. GitHub repo
-2. Vercel project
-3. Storage → Blob store (підключить `BLOB_READ_WRITE_TOKEN`)
-4. Env: `AUTH_SECRET`
+- bcrypt (cost 12), httpOnly session cookie, SameSite=Lax  
+- Приватні Blob на юзера (не один спільний JSON)  
+- Rate limit на login/register  
+- Security headers + CSP  
+- Service worker кешує лише статику (не HTML кабінету)  
+- Flash-помилки в cookie (не в URL)  
 
 ## Стек
 
-Next.js · Vercel · JWT cookies · Vercel Blob (прод) / локальний JSON
+Next.js · Vercel · JWT · Vercel Blob · PWA
