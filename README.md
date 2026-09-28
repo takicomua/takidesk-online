@@ -1,36 +1,36 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# takiDesk Online
 
-## Getting Started
+Сайт продукту: інформація, реєстрація, кабінет із завантаженням для ПК і PWA для телефону.
 
-First, run the development server:
+Окремий проєкт від desktop-агента `texnolodgia` / takiDesk. Медіа-трафік remote desktop **не** йде через цей сайт.
+
+## Локально
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Відкрий [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Акаунти зберігаються в `data/users.json` (локально, gitignore).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Змінні оточення
 
-## Learn More
+Скопіюй `.env.example` → `.env.local`:
 
-To learn more about Next.js, take a look at the following resources:
+- `AUTH_SECRET` — секрет для сесій (обовʼязково на Vercel, мін. 16 символів)
+- `BLOB_READ_WRITE_TOKEN` — Vercel Blob (на проді; локально не потрібен)
+- `NEXT_PUBLIC_PC_DOWNLOAD_URL` — лінк на Windows-інсталер
+- `NEXT_PUBLIC_ANDROID_DOWNLOAD_URL` — опційний лінк на APK
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Деплой
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. GitHub repo
+2. Vercel project
+3. Storage → Blob store (підключить `BLOB_READ_WRITE_TOKEN`)
+4. Env: `AUTH_SECRET`
 
-## Deploy on Vercel
+## Стек
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Next.js · Vercel · JWT cookies · Vercel Blob (прод) / локальний JSON

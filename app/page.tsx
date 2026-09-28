@@ -1,69 +1,116 @@
-import Image from "next/image";
+import Link from "next/link";
+import { SiteFooter, SiteHeader } from "@/components/site-chrome";
+import { getSessionUser } from "@/lib/auth";
+import { site } from "@/lib/site";
 
-export default function Home() {
+export default async function HomePage() {
+  const user = await getSessionUser();
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <>
+      <SiteHeader userName={user?.name} />
+
+      <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col px-5 pb-16 sm:px-8">
+        <section className="flex min-h-[78vh] flex-col justify-center gap-8 py-10">
+          <div className="fade-up max-w-3xl space-y-5">
+            <p className="font-display text-4xl font-extrabold tracking-tight text-[var(--accent)] sm:text-6xl md:text-7xl">
+              {site.name}
+            </p>
+            <h1 className="max-w-2xl text-2xl font-semibold leading-snug text-[var(--fg)] sm:text-3xl md:text-4xl">
+              {site.tagline}
+            </h1>
+            <p className="fade-up-delay max-w-xl text-base leading-relaxed text-[var(--muted)] sm:text-lg">
+              Зареєструйся, скачай додаток на ПК і постав PWA на телефон.
+              Звʼязок іде напряму з твого компʼютера — ми не тягнемо твій екран через свої сервери.
+            </p>
+          </div>
+
+          <div className="fade-up-delay-2 flex flex-wrap gap-3">
+            <Link href={user ? "/dashboard" : "/register"} className="btn btn-primary">
+              {user ? "Відкрити кабінет" : "Почати безкоштовно"}
+            </Link>
+            <a href="#how" className="btn btn-ghost">
+              Як це працює
+            </a>
+          </div>
+
+          <div
+            className="fade-up-delay-2 pointer-events-none absolute inset-x-0 top-24 -z-10 mx-auto h-[42vh] max-w-5xl opacity-70"
+            aria-hidden
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+            <div className="absolute inset-0 rounded-[40%] bg-[radial-gradient(circle_at_30%_40%,rgba(200,241,53,0.18),transparent_55%),radial-gradient(circle_at_70%_50%,rgba(110,200,184,0.14),transparent_50%)] blur-2xl" />
+          </div>
+        </section>
+
+        <section id="how" className="grid gap-10 py-8 md:grid-cols-[1.1fr_0.9fr] md:gap-14">
+          <div className="space-y-4">
+            <h2 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+              Один акаунт. Твій ПК. Твій телефон.
+            </h2>
+            <p className="max-w-xl text-[var(--muted)]">
+              takiDesk Online — це зручний вхід і завантаження. Сам remote desktop лишається
+              на твоєму ПК: безкоштовніше для тебе і легше для нас.
+            </p>
+          </div>
+
+          <ol className="surface space-y-0 overflow-hidden rounded-3xl">
+            {[
+              {
+                n: "01",
+                t: "Реєстрація",
+                d: "Створюєш акаунт за хвилину — email і пароль.",
+              },
+              {
+                n: "02",
+                t: "Додаток на ПК",
+                d: "У кабінеті скачуєш takiDesk і ставиш на компʼютер.",
+              },
+              {
+                n: "03",
+                t: "PWA на телефон",
+                d: "Встановлюєш сайт як додаток і підключаєшся до свого ПК.",
+              },
+            ].map((step) => (
+              <li
+                key={step.n}
+                className="border-b border-[var(--line)] px-5 py-5 last:border-b-0 sm:px-6"
+              >
+                <div className="flex items-start gap-4">
+                  <span className="font-display text-sm text-[var(--accent)]">{step.n}</span>
+                  <div>
+                    <p className="font-semibold">{step.t}</p>
+                    <p className="mt-1 text-sm text-[var(--muted)]">{step.d}</p>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section className="mt-8 grid gap-4 sm:grid-cols-3">
+          {[
+            {
+              title: "Без важкого трафіку",
+              text: "Відео екрану не проходить через наші сервери — лише твій ПК і пристрій.",
+            },
+            {
+              title: "Швидкий старт",
+              text: "Акаунт → завантаження → підключення. Без купівлі домену і ручних тунелів.",
+            },
+            {
+              title: "Під твоїм контролем",
+              text: "Компʼютер лишається вдома. Ти вирішуєш, коли він онлайн.",
+            },
+          ].map((card) => (
+            <article key={card.title} className="surface rounded-3xl p-5 sm:p-6">
+              <h3 className="font-display text-xl font-bold">{card.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">{card.text}</p>
+            </article>
+          ))}
+        </section>
       </main>
-    </div>
+
+      <SiteFooter />
+    </>
   );
 }
