@@ -50,7 +50,15 @@ export function SiteFooter() {
     <footer className="relative z-10 mx-auto mt-auto w-full max-w-6xl px-5 py-10 text-sm text-[var(--muted)] sm:px-8">
       <div className="flex flex-col gap-3 border-t border-[var(--line)] pt-6 sm:flex-row sm:items-center sm:justify-between">
         <p>
-          © {new Date().getFullYear()} {site.name}. Стрім іде з твого ПК.
+          © {new Date().getFullYear()} {site.name}. Розробник:{" "}
+          <a
+            href="https://ndx.com.ua"
+            target="_blank"
+            rel="noopener"
+            className="text-[var(--fg)] hover:text-[var(--accent)]"
+          >
+            ndx.com.ua
+          </a>
         </p>
         <div className="flex flex-wrap gap-4">
           <Link href="/privacy" className="hover:text-[var(--fg)]">

@@ -22,6 +22,9 @@ export const metadata: Metadata = {
   },
   description: site.description,
   applicationName: site.name,
+  authors: [{ name: "ndx.com.ua", url: "https://ndx.com.ua" }],
+  creator: "ndx.com.ua",
+  publisher: "ndx.com.ua",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,

@@ -46,14 +46,10 @@ export default async function DashboardPage() {
             <p className="text-sm text-[var(--accent)]">Крок 2</p>
             <h2 className="mt-2 font-display text-2xl font-bold">Додаток на ПК</h2>
             <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
-              Встанови takiDesk на Windows і залиш програму запущеною, коли хочеш підключатись.
+              Розпакуй архів, запусти takiDesk.exe — на екрані зʼявиться твій особистий PIN і
+              QR-код.
             </p>
-            <a
-              href={downloads.pc}
-              className="btn btn-primary mt-6"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <a href={downloads.pc} className="btn btn-primary mt-6" rel="noopener noreferrer">
               Завантажити для Windows
             </a>
           </li>
@@ -62,10 +58,17 @@ export default async function DashboardPage() {
             <p className="text-sm text-[var(--teal)]">Крок 3</p>
             <h2 className="mt-2 font-display text-2xl font-bold">PWA на телефон</h2>
             <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
-              Встанови цей сайт як додаток — кабінет завжди на головному екрані телефону.
+              Встанови цей сайт як додаток або постав Android-клієнт, потім введи PIN з ПК.
             </p>
-            <div className="mt-6">
+            <div className="mt-6 flex flex-col gap-3">
               <InstallPwaButton />
+              <a
+                href={downloads.android}
+                className="btn btn-ghost w-full sm:w-auto"
+                rel="noopener noreferrer"
+              >
+                Android APK
+              </a>
             </div>
           </li>
         </ol>
@@ -74,8 +77,8 @@ export default async function DashboardPage() {
           <h2 className="font-display text-2xl font-bold">Як користуватись</h2>
           <ol className="mt-4 space-y-3 text-sm text-[var(--muted)]">
             <li>1. ПК увімкнений, takiDesk запущений.</li>
-            <li>2. Відкрий PWA на телефоні → кабінет.</li>
-            <li>3. Підключайся до свого компʼютера з будь-якої мережі.</li>
+            <li>2. На телефоні відкрий takiDesk (APK) або відскануй QR-код з екрана ПК.</li>
+            <li>3. Введи свій PIN. Для доступу поза домом натисни «Інтернет» на ПК і задай пароль.</li>
           </ol>
         </section>
       </main>

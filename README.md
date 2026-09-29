@@ -38,3 +38,7 @@ npm run dev
 ## Стек
 
 Next.js · Vercel · JWT · Vercel Blob · PWA
+
+## Розробник
+
+[ndx.com.ua](https://ndx.com.ua)
