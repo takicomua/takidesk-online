@@ -33,7 +33,7 @@ npm run dev
 - Rate limit на login/register  
 - Security headers + CSP  
 - Service worker кешує лише статику (не HTML кабінету)  
-- Flash-помилки в cookie (не в URL)  
+- Помилки форм повертаються з server action (не в URL)  
 
 ## Стек
 

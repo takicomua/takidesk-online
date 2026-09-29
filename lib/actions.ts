@@ -1,34 +1,28 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { destroySession, loginUser, registerUser, setFlash } from "./auth";
+import { destroySession, loginUser, registerUser } from "./auth";
 
-export async function registerAction(formData: FormData) {
+export type FormState = { error: string | null };
+
+export async function registerAction(_prev: FormState, formData: FormData): Promise<FormState> {
   const result = await registerUser({
     name: formData.get("name"),
     email: formData.get("email"),
     password: formData.get("password"),
   });
 
-  if (!result.ok) {
-    await setFlash(result.error);
-    redirect("/register");
-  }
-
+  if (!result.ok) return { error: result.error };
   redirect("/dashboard");
 }
 
-export async function loginAction(formData: FormData) {
+export async function loginAction(_prev: FormState, formData: FormData): Promise<FormState> {
   const result = await loginUser({
     email: formData.get("email"),
     password: formData.get("password"),
   });
 
-  if (!result.ok) {
-    await setFlash(result.error);
-    redirect("/login");
-  }
-
+  if (!result.ok) return { error: result.error };
   redirect("/dashboard");
 }
 

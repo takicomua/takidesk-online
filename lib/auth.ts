@@ -6,7 +6,6 @@ import type { PublicUser } from "./types";
 import { loginSchema, registerSchema } from "./types";
 import {
   BCRYPT_ROUNDS,
-  FLASH_COOKIE,
   SESSION_COOKIE,
   SESSION_MAX_AGE,
   requireAuthSecret,
@@ -36,23 +35,6 @@ async function clientKey(suffix: string) {
   const forwarded = h.get("x-forwarded-for")?.split(",")[0]?.trim();
   const ip = forwarded || h.get("x-real-ip") || "unknown";
   return `${suffix}:${ip}`;
-}
-
-export async function setFlash(message: string) {
-  const jar = await cookies();
-  jar.set(FLASH_COOKIE, message, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: 30,
-  });
-}
-
-/** Read-only: server components cannot write cookies; middleware clears it on the response. */
-export async function readFlash(): Promise<string | null> {
-  const jar = await cookies();
-  return jar.get(FLASH_COOKIE)?.value ?? null;
 }
 
 export async function createSession(user: PublicUser) {

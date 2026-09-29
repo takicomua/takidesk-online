@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { RegisterForm } from "@/components/auth-forms";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
-import { registerAction } from "@/lib/actions";
-import { getSessionUser, readFlash } from "@/lib/auth";
+import { getSessionUser } from "@/lib/auth";
 
 export const metadata = {
   title: "Реєстрація",
@@ -13,8 +13,6 @@ export const dynamic = "force-dynamic";
 export default async function RegisterPage() {
   const user = await getSessionUser();
   if (user) redirect("/dashboard");
-
-  const error = await readFlash();
 
   return (
     <>
@@ -27,45 +25,7 @@ export default async function RegisterPage() {
             Далі скачаєш додаток на ПК і поставиш PWA на телефон.
           </p>
 
-          {error ? (
-            <p
-              role="alert"
-              className="mt-4 rounded-2xl border border-[color-mix(in_oklab,var(--danger)_45%,transparent)] bg-[color-mix(in_oklab,var(--danger)_12%,transparent)] px-3 py-2 text-sm text-[#ffb4b4]"
-            >
-              {error}
-            </p>
-          ) : null}
-
-          <form action={registerAction} className="mt-6 space-y-4">
-            <label className="block space-y-2 text-sm">
-              <span className="text-[var(--muted)]">Імʼя</span>
-              <input className="field" name="name" required minLength={2} autoComplete="name" />
-            </label>
-            <label className="block space-y-2 text-sm">
-              <span className="text-[var(--muted)]">Email</span>
-              <input
-                className="field"
-                name="email"
-                type="email"
-                required
-                autoComplete="email"
-              />
-            </label>
-            <label className="block space-y-2 text-sm">
-              <span className="text-[var(--muted)]">Пароль (літери + цифри, мін. 8)</span>
-              <input
-                className="field"
-                name="password"
-                type="password"
-                required
-                minLength={8}
-                autoComplete="new-password"
-              />
-            </label>
-            <button type="submit" className="btn btn-primary w-full">
-              Зареєструватись
-            </button>
-          </form>
+          <RegisterForm />
 
           <p className="mt-5 text-center text-sm text-[var(--muted)]">
             Вже є акаунт?{" "}

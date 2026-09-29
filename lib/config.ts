@@ -1,5 +1,4 @@
 export const SESSION_COOKIE = "takidesk_session";
-export const FLASH_COOKIE = "takidesk_flash";
 export const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 export const BCRYPT_ROUNDS = 12;
 

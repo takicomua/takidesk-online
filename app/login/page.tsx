@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { LoginForm } from "@/components/auth-forms";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
-import { loginAction } from "@/lib/actions";
-import { getSessionUser, readFlash } from "@/lib/auth";
+import { getSessionUser } from "@/lib/auth";
 
 export const metadata = {
   title: "Увійти",
@@ -14,8 +14,6 @@ export default async function LoginPage() {
   const user = await getSessionUser();
   if (user) redirect("/dashboard");
 
-  const error = await readFlash();
-
   return (
     <>
       <SiteHeader />
@@ -26,40 +24,7 @@ export default async function LoginPage() {
             Доступ до кабінету takiDesk Online.
           </p>
 
-          {error ? (
-            <p
-              role="alert"
-              className="mt-4 rounded-2xl border border-[color-mix(in_oklab,var(--danger)_45%,transparent)] bg-[color-mix(in_oklab,var(--danger)_12%,transparent)] px-3 py-2 text-sm text-[#ffb4b4]"
-            >
-              {error}
-            </p>
-          ) : null}
-
-          <form action={loginAction} className="mt-6 space-y-4">
-            <label className="block space-y-2 text-sm">
-              <span className="text-[var(--muted)]">Email</span>
-              <input
-                className="field"
-                name="email"
-                type="email"
-                required
-                autoComplete="email"
-              />
-            </label>
-            <label className="block space-y-2 text-sm">
-              <span className="text-[var(--muted)]">Пароль</span>
-              <input
-                className="field"
-                name="password"
-                type="password"
-                required
-                autoComplete="current-password"
-              />
-            </label>
-            <button type="submit" className="btn btn-primary w-full">
-              Увійти
-            </button>
-          </form>
+          <LoginForm />
 
           <p className="mt-5 text-center text-sm text-[var(--muted)]">
             Немає акаунта?{" "}
