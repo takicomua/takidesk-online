@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { jwtVerify } from "jose";
-import { SESSION_COOKIE } from "@/lib/config";
+import { FLASH_COOKIE, SESSION_COOKIE } from "@/lib/config";
 
 function getSecret() {
   const secret = (process.env.AUTH_SECRET ?? "").trim().replace(/^["']|["']$/g, "");
@@ -22,6 +22,16 @@ export async function middleware(request: NextRequest) {
     pathname === "/register"
   ) {
     response.headers.set("Cache-Control", "private, no-store, max-age=0");
+  }
+
+  // One-shot flash: the page reads it from the request; clear on the response.
+  // Only on GET — the form POST to the same path is what sets it.
+  if (
+    request.method === "GET" &&
+    (pathname === "/login" || pathname === "/register") &&
+    request.cookies.has(FLASH_COOKIE)
+  ) {
+    response.cookies.set(FLASH_COOKIE, "", { path: "/", maxAge: 0 });
   }
 
   if (pathname.startsWith("/dashboard")) {

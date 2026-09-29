@@ -45,23 +45,14 @@ export async function setFlash(message: string) {
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    maxAge: 60,
+    maxAge: 30,
   });
 }
 
-export async function consumeFlash(): Promise<string | null> {
+/** Read-only: server components cannot write cookies; middleware clears it on the response. */
+export async function readFlash(): Promise<string | null> {
   const jar = await cookies();
-  const value = jar.get(FLASH_COOKIE)?.value ?? null;
-  if (value) {
-    jar.set(FLASH_COOKIE, "", {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 0,
-    });
-  }
-  return value;
+  return jar.get(FLASH_COOKIE)?.value ?? null;
 }
 
 export async function createSession(user: PublicUser) {

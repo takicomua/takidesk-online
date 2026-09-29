@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { registerAction } from "@/lib/actions";
-import { consumeFlash, getSessionUser } from "@/lib/auth";
+import { getSessionUser, readFlash } from "@/lib/auth";
 
 export const metadata = {
   title: "Реєстрація",
@@ -14,7 +14,7 @@ export default async function RegisterPage() {
   const user = await getSessionUser();
   if (user) redirect("/dashboard");
 
-  const error = await consumeFlash();
+  const error = await readFlash();
 
   return (
     <>
